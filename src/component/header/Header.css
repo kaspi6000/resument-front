@@ -1,0 +1,16 @@
+.Header {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 3rem;
+    width: 70%;
+    float: left;
+}
+
+.sideNav {
+    float: left;
+    width: 15%;
+}
+
+.Auth {
+    float: right;
+    width: 15%;
+}
