@@ -13,12 +13,15 @@ import Divider from '@material-ui/core/Divider';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-// import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide'
 
 // Icons
-import {Menu, Lock, LockOpen} from '@material-ui/icons';
+// 사용시에 compil 6초................FUCK
+// import {Menu, Lock, LockOpen} from '@material-ui/icons';
+import Menu from '@material-ui/icons/Menu';
+import Lock from '@material-ui/icons/Lock';
+import LockOpen from '@material-ui/icons/LockOpen';
 
 // TextField
 import TextField from '@material-ui/core/TextField';
@@ -63,7 +66,8 @@ class Header extends Component {
                 <Divider />
                 <List>wefwefwlebrl</List>
             </div>
-        )
+        );
+
         return (
             <div style={{padding: '2.5rem'}}>
 
@@ -73,7 +77,7 @@ class Header extends Component {
 
                 <Drawer open = {this.state.left} onClose = {this.toggleDrawer('left', false)}>
                     <div
-                        tabIndex = {1}
+                        tabIndex = {0}
                         role = 'button'
                         onClick = {this.toggleDrawer('left', false)}
                         onKeyDown = {this.toggleDrawer('left', false)}
