@@ -1,14 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
+import Root from './Root';
+import * as registerServiceWorker from './registerServiceWorker';
 
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import configureStore from './store/configureStore';
 
-ReactDOM.render(<BrowserRouter>
-                    <Switch>
-                        <Route exact path = "/" component = {App}></Route>
-                        <Route path = "/resume" component = {App}></Route>
-                    </Switch>
-                </BrowserRouter>
-, document.getElementById('root'));
+const initialState = window.__INITIAL_STATE__ || {};
+const store = configureStore(initialState);
+
+ReactDOM.render(<Provider store={store}><Root/></Provider>, document.getElementById('root'));
+
+registerServiceWorker.default();

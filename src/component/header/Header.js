@@ -26,19 +26,36 @@ import LockOpen from '@material-ui/icons/LockOpen';
 // TextField
 import TextField from '@material-ui/core/TextField';
 
+// Radio
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+
+import { connect } from 'react-redux';
+import { authLogin, authCheck } from '../../action/authAction';
+
 function transition(props) {
     return <Slide direction="down" {...props} />;
 }
 
 class Header extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
-            id: null,
-            pw: null,
+            id: '',
+            pw: '',
+            name: '',
+            gender: '1',
             left: false,
-            open: false
+            open: false,
+            isSignup: false,
+            isAuth: false,
+            token: sessionStorage.getItem('RESUMENT_TOKEN')
         }
+    }
+
+    componentDidMount() {
+        console.log('token', this.state.token);
     }
 
     toggleDrawer = (side, open) => () => {
@@ -55,7 +72,51 @@ class Header extends Component {
 
     handleClose = () => {
         this.setState({
-            open: false
+            open: false,
+            isSignup: false,
+            id: '',
+            pw: '',
+            name: '',
+            gender: '1'
+        });
+    }
+
+    handleSignup = () => {
+        this.setState({
+            isSignup: true
+        });
+    }
+
+    handleChange = key => (event) => {
+        this.setState({
+            [key]: event.target.value
+        });
+    }
+
+    handleLogin = async() => {
+
+        const { id, pw } = this.state;
+        
+        console.log({id});
+        console.log({pw})
+        await this.props.authLogin(id, pw);
+        await this.handleClose();
+    }
+
+    handleCheck = () => {
+
+        const token = sessionStorage.getItem('RESUMENT_TOKEN');
+
+        this.props.authCheck(token).then(data => {
+            console.log(data);
+        });
+    }
+
+    handleLogout = () => {
+        // localStorage.setItem('Ut', null);
+        sessionStorage.removeItem('RESUMENT_TOKEN');
+        this.setState({
+            token: null
         });
     }
     render() {
@@ -65,6 +126,50 @@ class Header extends Component {
                 <List>dfsef</List>
                 <Divider />
                 <List>wefwefwlebrl</List>
+            </div>
+        );
+
+        const signup = (
+            <div>
+                <DialogTitle>
+                        {"회원가입 하기"}
+                </DialogTitle>
+                <DialogContent>
+                    <TextField required label = "ID" margin = "normal" onChange = {this.handleChange('id')} /><br/>
+                    <TextField required label = "PW" type = "password" margin = "normal" onChange = {this.handleChange('pw')} /><br/>
+                    <TextField required label = "NAME" margin = "normal" onChange = {this.handleChange('name')} /><br/>
+                    <RadioGroup
+                        row
+                        name="gender"
+                        aria-label="GENDER"
+                        value={this.state.gender}
+                        onChange={this.handleChange('gender')}
+                    >
+                        <FormControlLabel value = "1" control = {<Radio />} label = "남자" />
+                        <FormControlLabel value = "2" control = {<Radio />} label = "여자" />
+                        <FormControlLabel value = "3" control = {<Radio />} label = "둘다 아니야!" />
+                    </RadioGroup>
+                </DialogContent>
+                {this.state.id} : {this.state.pw} : {this.state.name} : {this.state.gender}
+                <DialogActions>
+                    <Button>SignUp</Button>
+                </DialogActions>
+            </div>
+        );
+
+        const login = (
+            <div>
+                <DialogTitle>
+                        {"로그인 하기"}
+                </DialogTitle>
+                <DialogContent>
+                    <TextField required label = "ID" margin = "normal" onChange = {this.handleChange('id')} /> <br/>
+                    <TextField required label = "PW" type = "password" margin = "normal" onChange = {this.handleChange('pw')} />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={this.handleLogin}>Login</Button>
+                    <Button onClick={this.handleSignup}>Sign Up</Button>
+                </DialogActions>
             </div>
         );
 
@@ -90,42 +195,29 @@ class Header extends Component {
                     Resument
                 </div>
 
+                <div>
+                    <Button onClick = {this.handleCheck}>CHECK</Button>
+                </div>
+
                 <div className = "Auth">
-                    <Button onClick = {this.handleOpen}><Lock /></Button>
+                    {
+                        this.state.token !== null ?
+                        (
+                            <Button onClick = {this.handleLogout}><LockOpen /></Button>
+                        )
+                        :
+                        (
+                            <Button onClick = {this.handleOpen}><Lock /></Button>
+                        )
+                    }
                 </div>
 
                 <Dialog
                     open={this.state.open}
                     TransitionComponent={transition}
-                    keepMounted
                     onClose={this.handleClose}
-                    aria-labelledby="alert-dialog-slide-title"
-                    aria-describedby="alert-dialog-slide-description"
                 >
-                    <DialogTitle id = "alert-dialog-slide-title">
-                        {"로그인 하기"}
-                    </DialogTitle>
-                    <DialogContent>
-                            <form noValidate autoComplete="off">
-                                <TextField 
-                                    required
-                                    id = "id"
-                                    label = "ID"
-                                    margin = "normal"
-                                /> <br/>
-                                <TextField 
-                                    required
-                                    id = "pw"
-                                    label = "PW"
-                                    type = "password"
-                                    margin = "normal"
-                                />
-                            </form>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button>Login</Button>
-                        <Button>Sign Up</Button>
-                    </DialogActions>
+                    {this.state.isSignup ? signup : login}
                 </Dialog>
                 
             </div>
@@ -133,4 +225,20 @@ class Header extends Component {
     }
 }
 
-export default Header;
+// export default Header;
+
+const mapToState = (state) => {
+    return {
+        isAuthenticated: state.auth.isAuthenticated,
+        isAuthenticating: state.auth.isAuthenticating,
+    };
+}
+
+const mapToProps = (dispatch) => {
+    return {
+        authLogin,
+        authCheck,
+    };
+}
+
+export default connect(mapToState, mapToProps)(Header);
